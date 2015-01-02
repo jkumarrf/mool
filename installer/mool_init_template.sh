@@ -1,6 +1,10 @@
 #!/bin/bash
 set_misc() {
   export CC_COMPILER='/usr/bin/g++ -Wall'
+  export GMOCK_DIR="VAR_GMOCK_DIR"
+  export GTEST_DIR="VAR_GMOCK_DIR"
+  export GTEST_MOCK_LIB="VAR_GTEST_MOCK_LIB"
+  export GTEST_MAIN_LIB="VAR_GTEST_MAIN_LIB"
 
   export JAVA_DEFAULT_VERSION="1.7"
   export JAVA_HOME="VAR_JAVA_HOME"

@@ -70,6 +70,20 @@ VIRTUALENV_URL = (('https://pypi.python.org/packages/source/v/virtualenv/'
                    'virtualenv-1.11.6.tar.gz'), 'virtualenv-1.11.6',
                   'd3f8e94bf825cc999924e276c8f1c63b8eeb0715')
 
+GMOCK_PACKAGE = ('https://googlemock.googlecode.com/files/gmock-1.7.0.zip',
+                 'f9d9dd882a25f4069ed9ee48e70aff1b53e3c5a5', 'gmock-1.7.0')
+GMOCK_BUILD_COMMANDS = [
+    """g++ -isystem {GTEST_DIR}/include -I{GTEST_DIR} -isystem
+       {GMOCK_DIR}/include -I{GMOCK_DIR} -o{TARGET_DIR}/gtest-all.o
+       -pthread -c {GTEST_DIR}/src/gtest-all.cc""",
+    """g++ -isystem {GTEST_DIR}/include -I{GTEST_DIR} -isystem
+       {GMOCK_DIR}/include -I{GMOCK_DIR} -o{TARGET_DIR}/gmock-all.o
+      -pthread -c {GMOCK_DIR}/src/gmock-all.cc""",
+    """g++ -isystem {GTEST_DIR}/include -I{GTEST_DIR}
+       -c {GTEST_DIR}/src/gtest_main.cc -o {TARGET_DIR}/gtest_main.o""",
+    """ar -rv {TARGET_DIR}/libgmock.a {TARGET_DIR}/gtest-all.o
+       {TARGET_DIR}/gmock-all.o"""]
+
 JAVA_PROTOBUF_JAR = 'protobuf-2.4.1.jar'
 PROTOBUF_PACKAGE = (('https://protobuf.googlecode.com/files/'
                      'protobuf-2.4.1.tar.bz2'), 'protobuf-2.4.1',
@@ -89,11 +103,11 @@ SCALA_2_11 = ('http://www.scala-lang.org/files/archive/scala-2.11.4.tgz',
 SCALA_2_8 = ('http://www.scala-lang.org/files/archive/scala-2.8.2.final.tgz',
              'scala-2.8.2.final', '2d6250763dcba02f371e0c26999a4f43670e8e3e')
 
-MOOL_GIT_REPO = 'https://github.com/jkumarrf/mool.git'
 MOOL_INIT_TEMPLATE_FILE = 'mool_init_template.sh'
 MOOL_INIT_VARS = ['JAR_SEARCH_PATH', 'JAVA_PROTOBUF_JAR', 'JAVA_HOME',
                   'PROTO_COMPILER', 'PYTHON_PROTOBUF_DIR',
-                  'SCALA_DEFAULT_VERSION', 'SCALA_HOME_2_8', 'SCALA_HOME_2_11']
+                  'SCALA_DEFAULT_VERSION', 'SCALA_HOME_2_8', 'SCALA_HOME_2_11',
+                  'GMOCK_DIR', 'GTEST_DIR', 'GTEST_MAIN_LIB', 'GTEST_MOCK_LIB']
 
 VARS_TO_EXPORT = {}
 VARS_TO_EXPORT['JAR_SEARCH_PATH'] = JAR_SEARCH_PATH
@@ -201,6 +215,7 @@ def _check_dependencies():
     try:
         javac_bin = os.path.join(VARS_TO_EXPORT['JAVA_HOME'], 'bin', 'javac')
         _execute([javac_bin, '-version'])
+        # TODO: Assert version >= 1.7.0
     except subprocess.CalledProcessError:
         LOGGER.error('Java support not found. Aborting installation!!')
         LOGGER.error(INSTALL_HELP_MSG)
@@ -303,6 +318,30 @@ def _setup_protobuf():
     VARS_TO_EXPORT['JAVA_PROTOBUF_JAR'] = protobuf_jar_path
 
 
+def _setup_gmock_gtest():
+    """Gtest is shipped along with gmock. Build and setup required libs."""
+    os.chdir(MOOL_PACKAGES_DIR)
+    url, sha_sum, dir_name = GMOCK_PACKAGE
+    dest_path = os.path.join(os.path.abspath('.'), os.path.basename(url))
+    download_item(url, dest_path, sha_sum)
+    _execute(['unzip', dest_path])
+    os.chdir(os.path.join(MOOL_PACKAGES_DIR, dir_name))
+    # Create target directory to store all useful stuff.
+    gmock_dir = os.path.abspath('.')
+    target_dir = os.path.join(gmock_dir, 'target')
+    gtest_dir = os.path.join(gmock_dir, 'gtest')
+    mkdir_p(target_dir)
+    for cmd in GMOCK_BUILD_COMMANDS:
+        cmd = cmd.format(GTEST_DIR=gtest_dir, GMOCK_DIR=gmock_dir,
+                         TARGET_DIR=target_dir)
+        _execute([' '.join([t.strip() for t in cmd.split('\n')])],
+                 use_shell=True)
+    VARS_TO_EXPORT['GMOCK_DIR'] = gmock_dir
+    VARS_TO_EXPORT['GTEST_DIR'] = gtest_dir
+    VARS_TO_EXPORT['GTEST_MAIN_LIB'] = os.path.join(target_dir, 'gtest_main.o')
+    VARS_TO_EXPORT['GTEST_MOCK_LIB'] = os.path.join(target_dir, 'libgmock.a')
+
+
 def _setup_mool_init():
     """Creates the mool_init.sh file."""
     LOGGER.info('Creating mool init script.')
@@ -340,6 +379,7 @@ def _install_all():
     _setup_virtualenv()
     _pip_install_packages(PIP_INSTALL_PACKAGES)
     _setup_protobuf()
+    _setup_gmock_gtest()
     _install_scala()
     _setup_mool_init()
     test_setup()
