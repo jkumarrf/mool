@@ -1,0 +1,71 @@
+# Build rules for croot/samples.
+
+# Libraries.
+"factorial": {
+  "rule_type": "cc_lib",
+  "srcs": ["factorial.cc"],
+  "hdrs": ["factorial.h"],
+  "deps": ["mool.croot.common.some_lib"],
+  "sys_deps": []
+},
+
+"person_cc_proto": {
+  "rule_type": "cc_proto_lib",
+  "srcs": ["person.proto"],
+  "deps": ["mool.croot.common.address_cc_proto"]
+},
+
+"PersonJavaProto": {
+  "rule_type": "java_proto_lib",
+  "srcs": ["person.proto"],
+  "deps": ["mool.croot.common.AddressJavaProto"]
+},
+
+"use_interface": {
+  "rule_type": "cc_lib",
+  "srcs": ["use_interface.cc"],
+  "hdrs": ["use_interface.h"]
+},
+
+
+# Binaries.
+"factorial_main": {
+  "rule_type": "cc_bin",
+  "srcs": ["factorial_main.cc"],
+  "incdirs": ["/usr/include/libxml2", "/usr/local/include"],
+  "deps": [
+      ".factorial",
+      "mool.croot.common.shared_headers",
+      "mool.croot.common.echo_utils"],
+  "sys_deps": ["-lxml2", "-pthread"]
+},
+
+"person_proto_main": {
+  "rule_type": "cc_bin",
+  "srcs": ["person_proto_main.cc"],
+  "incdirs": ["/usr/local/include"],
+  "deps": [
+      ".person_cc_proto"],
+  "sys_deps": ["-lprotobuf", "-lpthread", "-pthread"]
+},
+
+# Unit Tests.
+"factorial_test": {
+  "rule_type": "cc_test",
+  "srcs": ["factorial_test.cc"],
+  "deps": [".factorial"],
+
+  # These precompiled dependency lists show how to add such items. Since these
+  # two are added by default by the build rule implementation, the following
+  # line is not exactly required.
+  "precompiled_deps": ["env.GTEST_MAIN_LIB", "env.GTEST_MOCK_LIB"]
+},
+
+"use_interface_test": {
+  "rule_type": "cc_test",
+  "srcs": ["use_interface_test.cc"],
+  "deps": [".use_interface"],
+
+  # This value in cc_test is not a must-have as it gets added automatically.
+  "sys_deps": ["-pthread"]
+}
