@@ -35,7 +35,7 @@ set_local_misc() {
 }
 
 if [ -e "${PROJECT_ROOT}/.mooltool/mool_init.sh" ]; then
-    source .mooltool/mool_init.sh
+    source ${PROJECT_ROOT}/.mooltool/mool_init.sh
 elif [ -e "${HOME}/.mooltool/mool_init.sh" ]; then
     source ${HOME}/.mooltool/mool_init.sh
 else

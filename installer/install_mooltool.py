@@ -74,8 +74,10 @@ JAVA_PROTOBUF_JAR = 'protobuf-2.4.1.jar'
 PROTOBUF_PACKAGE = (('https://protobuf.googlecode.com/files/'
                      'protobuf-2.4.1.tar.bz2'), 'protobuf-2.4.1',
                     'df5867e37a4b51fb69f53a8baf5b994938691d6d')
+
+# TODO: Remove MySQL from dependencies, required by Rocket Fuel code examples.
 PIP_INSTALL_PACKAGES = [('pylint', '0.28.0'), ('pep8', '1.4.5'),
-                        ('pytest', '2.3.4')]
+                        ('pytest', '2.3.4'), ('MySQL-python', '1.2.3')]
 NEXUS_REPO_URL = 'http://nexus.rfiserve.net/content/groups/public'
 DEFAULT_JAR_PACKAGES = [('org/testng/testng/6.8/testng-6.8.jar',
                          'ad4531b28715d39f73c49a56caf0c456cb34d48c'),
@@ -328,7 +330,7 @@ def test_setup():
     activate_this = os.path.join(VIRTUALENV_PATH, 'bin', 'activate_this.py')
     execfile(activate_this, dict(__file__=activate_this))
     test_script = os.path.join(os.path.dirname(THIS_SCRIPT_DIR), 'test_all.sh')
-    _execute('bash {}'.format(test_script), use_shell=True, stdout=True)
+    _execute(['bash', test_script], use_shell=True, stdout=True)
 
 
 def _install_all():
