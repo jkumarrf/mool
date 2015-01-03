@@ -85,8 +85,7 @@ GMOCK_BUILD_COMMANDS = [
        {TARGET_DIR}/gmock-all.o"""]
 
 JAVA_PROTOBUF_JAR = 'protobuf-2.4.1.jar'
-PROTOBUF_PACKAGE = (('file:///Users/jkumar/rf/downloads/'
-#PROTOBUF_PACKAGE = (('https://protobuf.googlecode.com/files/'
+PROTOBUF_PACKAGE = (('https://protobuf.googlecode.com/files/'
                      'protobuf-2.4.1.tar.bz2'), 'protobuf-2.4.1',
                     'df5867e37a4b51fb69f53a8baf5b994938691d6d')
 
@@ -379,8 +378,8 @@ def _install_all():
     """Installer utility for mool tool."""
     LOGGER.info('**** Check %s for installation logs. ****', LOG_FILE_PATH)
     _check_dependencies()
-    #_setup_virtualenv()
-    #_pip_install_packages(PIP_INSTALL_PACKAGES)
+    _setup_virtualenv()
+    _pip_install_packages(PIP_INSTALL_PACKAGES)
     _setup_protobuf()
     _setup_gmock_gtest()
     _install_scala()

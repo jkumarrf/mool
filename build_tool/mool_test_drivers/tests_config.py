@@ -1,9 +1,10 @@
 """This file has list of various build rules to be tested."""
 
-SKIPPED_BUILD_COUNT = 59
+SKIPPED_BUILD_COUNT = 74
 
 # Regression tests.
 REG_BUILD_RULES = [
+    'mool.croot.samples.PersonJavaProto',
     'mool.jroot.src.main.java.some.work.DriverFromMavenSpec',
     'mool.jroot.src.main.java.some.work.DriverWithReducedDeps',
     'mool.jroot.src.main.java.some.work.DriverFromDriverLibWithMissingDeps']
@@ -20,6 +21,14 @@ REG_PATTERN_TESTS = [
 
 # All build rules and tests.
 BUILD_RULES = [
+    'mool.croot.samples.factorial_test',
+    'mool.croot.samples.factorial_main',
+    'mool.croot.samples.use_interface',
+    'mool.croot.samples.use_interface_test',
+    'mool.croot.common.echo_utils_test',
+    'mool.croot.samples.person_proto_main',
+    'mool.croot.common.ALL',
+    'mool.croot.samples.ALL',
     'mool.jroot.src.main.java.some.other.work.HelloWorld',
     'mool.jroot.src.test.java.some.other.work.HelloWorldTest',
     'mool.jroot.src.main.java.some.work.Driver',
@@ -50,6 +59,7 @@ BUILD_RULES = [
     'mool.scalaroot.com.testTwo.ALL']
 
 BUILD_TESTS = [
+    'mool.croot.common.echo_utils_test', 'mool.croot.common.some_lib_test',
     'mool.jroot.org.personal.secondlib.SecondMainTest',
     'mool.jroot.org.personal.secondlib.SecondMainTest',
     'mool.pyroot.first_service.first_module.ALL',
@@ -59,6 +69,8 @@ BUILD_TESTS = [
     'mool.scalaroot.com.testTwo.AnotherTest']
 
 FILE_COUNT_TESTS = [
+    (10, 'croot/common/AddressJavaProto.jar'),
+    (15, 'croot/samples/PersonJavaProto.jar'),
     (8, 'jroot/src/main/java/some/work/some_resource_files.jar'),
     (7, 'jroot/src/main/java/some/work/BinWithNoDependencies.jar'),
     (184, 'jroot/src/main/java/some/work/Driver.jar'),
