@@ -85,7 +85,8 @@ GMOCK_BUILD_COMMANDS = [
        {TARGET_DIR}/gmock-all.o"""]
 
 JAVA_PROTOBUF_JAR = 'protobuf-2.4.1.jar'
-PROTOBUF_PACKAGE = (('https://protobuf.googlecode.com/files/'
+PROTOBUF_PACKAGE = (('file:///Users/jkumar/rf/downloads/'
+#PROTOBUF_PACKAGE = (('https://protobuf.googlecode.com/files/'
                      'protobuf-2.4.1.tar.bz2'), 'protobuf-2.4.1',
                     'df5867e37a4b51fb69f53a8baf5b994938691d6d')
 
@@ -106,7 +107,8 @@ SCALA_2_8 = ('http://www.scala-lang.org/files/archive/scala-2.8.2.final.tgz',
 MOOL_INIT_TEMPLATE_FILE = 'mool_init_template.sh'
 MOOL_INIT_VARS = ['JAR_SEARCH_PATH', 'JAVA_PROTOBUF_JAR', 'JAVA_HOME',
                   'PROTO_COMPILER', 'PYTHON_PROTOBUF_DIR',
-                  'SCALA_DEFAULT_VERSION', 'SCALA_HOME_2_8', 'SCALA_HOME_2_11',
+                  'PROTOBUF_INSTALL_DIR', 'SCALA_DEFAULT_VERSION',
+                  'SCALA_HOME_2_8', 'SCALA_HOME_2_11',
                   'GMOCK_DIR', 'GTEST_DIR', 'GTEST_MAIN_LIB', 'GTEST_MOCK_LIB']
 
 VARS_TO_EXPORT = {}
@@ -292,6 +294,7 @@ def _setup_protobuf():
     protoc_binary = os.path.join(cur_dir, 'bin', 'protoc')
     assert os.path.exists(protoc_binary)
     VARS_TO_EXPORT['PROTO_COMPILER'] = protoc_binary
+    VARS_TO_EXPORT['PROTOBUF_INSTALL_DIR'] = cur_dir
 
     os.chdir(os.path.join(cur_dir, 'python'))
     _execute(['python', 'setup.py', 'build'])
@@ -369,15 +372,15 @@ def test_setup():
     activate_this = os.path.join(VIRTUALENV_PATH, 'bin', 'activate_this.py')
     execfile(activate_this, dict(__file__=activate_this))
     test_script = os.path.join(os.path.dirname(THIS_SCRIPT_DIR), 'test_all.sh')
-    _execute(['bash', test_script], use_shell=True, stdout=True)
+    _execute(['bash', test_script], stdout=True)
 
 
 def _install_all():
     """Installer utility for mool tool."""
     LOGGER.info('**** Check %s for installation logs. ****', LOG_FILE_PATH)
     _check_dependencies()
-    _setup_virtualenv()
-    _pip_install_packages(PIP_INSTALL_PACKAGES)
+    #_setup_virtualenv()
+    #_pip_install_packages(PIP_INSTALL_PACKAGES)
     _setup_protobuf()
     _setup_gmock_gtest()
     _install_scala()
