@@ -69,8 +69,8 @@ class CplusplusCommon(object):
     """Set precompiled dependency flags."""
     pc_deps = rule_details.get(su.PC_DEPS_KEY, [])
     pc_deps.extend(extra_pc_deps or [])
-    pc_deps = sorted(list(set(pc_deps)))
-    rule_details[su.PC_DEPS_KEY] = [su.expand_env_vars(d) for d in pc_deps]
+    pc_deps = sorted(list(set(su.expand_env_vars(d) for d in pc_deps)))
+    rule_details[su.PC_DEPS_KEY] = pc_deps
 
   @classmethod
   def _set_possible_prefixes(cls, rule_details, details_map):
@@ -125,7 +125,8 @@ class CplusplusCommon(object):
     """Initializing build rule dictionary."""
     out_file, is_test, extra_pc_deps, compile_params = init_params
     su.init_rule_common(rule_details, out_file, [su.SRCS_KEY, su.HDRS_KEY])
-    rule_details[su.COMPILE_PARAMS_KEY] = compile_params or []
+    compile_params.extend(rule_details.get(su.COMPILE_PARAMS_KEY, []))
+    rule_details[su.COMPILE_PARAMS_KEY] = compile_params
     cls._set_pc_deps(rule_details, extra_pc_deps)
     if not rule_details[su.SRCS_KEY]:
       rule_details[su.SRCS_KEY] = [su.DUMMY_CC]

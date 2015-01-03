@@ -1,5 +1,8 @@
 mock_cat TEST_BUILD_ROOT/py/first_service/first_module/BLD
 mock_cat TEST_BUILD_ROOT/py/second_service/another_module/BLD
+mock_ls TEST_PYTHON_PROTOBUF_DIR
+mock_ls TEST_PYTHON_PROTOBUF_DIR
+mock_ls TEST_PYTHON_PROTOBUF_DIR
 mkdir -p TEST_BUILD_OUT_DIR/py/first_service/first_module
 mkdir -p TEST_BUILD_WORK_DIR/py/first_service/first_module/address_py_proto
 mkdir -p TEST_BUILD_WORK_DIR/py/first_service/first_module/address_py_proto/proto_outfiles
@@ -11,7 +14,6 @@ TEST_PROTO_COMPILER --proto_path=. --python_out=TEST_BUILD_WORK_DIR/py/first_ser
 mock_cd TEST_BUILD_WORK_DIR/py/first_service/first_module/address_py_proto/proto_outfiles
 create_initializers []
 mock_python_perform_linking ['py_lib', 'py.fake.main.method', 'TEST_BUILD_WORK_DIR/py/first_service/first_module/address_py_proto/proto_src/.tmp.address_py_proto', 'TEST_BUILD_OUT_DIR/py/first_service/first_module/address_py_proto']
-mock_ls TEST_PYTHON_PROTOBUF_DIR
 mock_coding_guidelines_check ['TEST_BUILD_ROOT/py/first_service/first_module/one_class.py', 'TEST_BUILD_ROOT/py/first_service/first_module/one_more_class.py']
 mkdir -p TEST_BUILD_OUT_DIR/py/first_service/first_module
 mkdir -p TEST_BUILD_WORK_DIR/py/first_service/first_module/main_lib/code
@@ -65,7 +67,6 @@ mock_python_expand_lib ['TEST_BUILD_OUT_DIR/py/first_service/first_module/main_l
 pylint --rcfile=/dev/null ./py/second_service/another_module/another_class.py
 TEST_PEP8_BINARY ./py/second_service/another_module/another_class.py
 mock_python_perform_linking ['py_lib', 'py.fake.main.method', 'TEST_BUILD_WORK_DIR/py/second_service/another_module/another_lib/target/.tmp.another_lib', 'TEST_BUILD_OUT_DIR/py/second_service/another_module/another_lib']
-mock_ls TEST_PYTHON_PROTOBUF_DIR
 mkdir -p TEST_BUILD_OUT_DIR/py/second_service/another_module
 mkdir -p TEST_BUILD_WORK_DIR/py/second_service/another_module/person_py_proto
 mkdir -p TEST_BUILD_WORK_DIR/py/second_service/another_module/person_py_proto/proto_outfiles
@@ -123,7 +124,6 @@ pylint --rcfile=/dev/null ./py/second_service/another_module/person_main_class.p
 TEST_PEP8_BINARY ./py/second_service/another_module/person_main_class.py
 mock_python_compile_all []
 mock_python_perform_linking ['py_bin', 'py.second_service.another_module.person_main_class.main_func', 'TEST_BUILD_WORK_DIR/py/second_service/another_module/person_main/target/.tmp.person_main', 'TEST_BUILD_OUT_DIR/py/second_service/another_module/person_main']
-mock_ls TEST_PYTHON_PROTOBUF_DIR
 mock_coding_guidelines_check ['TEST_BUILD_ROOT/py/second_service/another_module/person_main_class.py']
 mkdir -p TEST_BUILD_OUT_DIR/py/second_service/another_module
 mkdir -p TEST_BUILD_WORK_DIR/py/second_service/another_module/person_main_from_proto_nodeps/code

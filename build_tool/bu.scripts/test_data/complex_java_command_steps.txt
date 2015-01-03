@@ -1,7 +1,11 @@
 mock_cat TEST_BUILD_ROOT/src/main/java/some/other/work/BLD
 mock_cat TEST_BUILD_ROOT/src/test/java/some/other/work/BLD
 mock_cat TEST_BUILD_ROOT/src/main/java/some/work/BLD
+mock_ls TEST_JAR_SEARCH_PATH/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar
 mock_cat TEST_BUILD_ROOT/src/test/java/some/work/BLD
+mock_ls TEST_JAR_SEARCH_PATH/org/testng/testng/6.8/testng-6.8.jar
+mock_ls TEST_JAR_SEARCH_PATH/com/beust/jcommander/1.27/jcommander-1.27.jar
+mock_ls TEST_JAR_SEARCH_PATH/some/external/library.jar
 mock_cat TEST_BUILD_ROOT/cc/samples/BLD
 mock_cat TEST_BUILD_ROOT/cc/common/BLD
 mkdir -p TEST_BUILD_OUT_DIR/cc/common
@@ -59,7 +63,6 @@ mkdir -p TEST_BUILD_WORK_DIR/src/main/java/some/work/MavenDepWithClassifier/code
 mkdir -p TEST_BUILD_WORK_DIR/src/main/java/some/work/MavenDepWithClassifier/target
 mock_cd TEST_BUILD_WORK_DIR/src/main/java/some/work/MavenDepWithClassifier/code
 mock_jar_merger [([], [], ['TEST_JAR_SEARCH_PATH/maven/group/test/maven_artifact/imaginary/maven_artifact-imaginary-maven_classifier.jar']), 'TEST_BUILD_OUT_DIR/src/main/java/some/work/MavenDepWithClassifier.jar', 'java_fake_main_class']
-mock_ls TEST_JAR_SEARCH_PATH/some/external/library.jar
 mkdir -p TEST_BUILD_OUT_DIR/src/main/java/some/work
 mkdir -p TEST_BUILD_WORK_DIR/src/main/java/some/work/SomeExternalLibrary/clsdeps
 mkdir -p TEST_BUILD_WORK_DIR/src/main/java/some/work/SomeExternalLibrary/code
@@ -126,7 +129,6 @@ mock_java_version_comparison version4 version1
 mock_java_version_comparison version4 version1
 mock_java_version_comparison version4 bad_version
 mock_java_version_comparison version4 bad_version
-mock_ls TEST_JAR_SEARCH_PATH/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar
 mkdir -p TEST_BUILD_OUT_DIR/src/main/java/some/work
 mkdir -p TEST_BUILD_WORK_DIR/src/main/java/some/work/Driver/clsdeps
 mkdir -p TEST_BUILD_WORK_DIR/src/main/java/some/work/Driver/code
@@ -312,8 +314,6 @@ mkdir -p ./META-INF
 TEST_JAVA_HOME/bin/jar cf TEST_BUILD_WORK_DIR/src/main/java/some/work/ProtoSampleMain/.temp.ProtoSampleMain.jar ./mock_file1 ./mock_file2
 mock_jar_merger [([], [], ['TEST_BUILD_WORK_DIR/src/main/java/some/work/ProtoSampleMain/.temp.ProtoSampleMain.jar', 'TEST_BUILD_OUT_DIR/src/main/java/some/other/work/ProtoSampleUtils.jar']), 'TEST_BUILD_OUT_DIR/src/main/java/some/work/ProtoSampleMain.jar', 'some.work.ProtoSampleMain']
 mock_java_version_comparison bad_version version4
-mock_ls TEST_JAR_SEARCH_PATH/com/beust/jcommander/1.27/jcommander-1.27.jar
-mock_ls TEST_JAR_SEARCH_PATH/org/testng/testng/6.8/testng-6.8.jar
 mkdir -p TEST_BUILD_OUT_DIR/src/test/java/some/work
 mkdir -p TEST_BUILD_WORK_DIR/src/test/java/some/work/DriverTest/clsdeps
 mkdir -p TEST_BUILD_WORK_DIR/src/test/java/some/work/DriverTest/code

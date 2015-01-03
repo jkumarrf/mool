@@ -16,6 +16,13 @@ FILE_DEP_PREFIX = 'FILE: '
 MAX_LOOP_COUNT = 5000
 TRACE_COMMANDS = (os.environ.get('DEBUG_MODE', '') != '')
 
+# Keys having relative path in rule, beginning with '.'.
+EXPAND_RULE_KEYS = [su.DEPS_KEY, su.COMPILE_DEPS_KEY, su.PACKAGE_TESTS_KEY,
+                    su.PACKAGE_MODULES_KEY, su.EXTRACT_RESOURCES_DEP_KEY]
+# Keys which can have 'env.' variable, that should to be expanded.
+EXPAND_VARS_KEYS = [su.SYS_DEPS_KEY, su.OTHER_INCLUDE_DIRS, su.PC_DEPS_KEY,
+                    su.COMPILE_PARAMS_KEY]
+
 
 class Error(Exception):
   """Generic error class."""
@@ -79,10 +86,15 @@ class RuleBuilder(object):
       return item
     assert False
 
-  def _expand_symbols_in_key(self, rule_details, rule_path, key):
-    """Expand symbols in a specified key."""
-    rule_details[key] = [
-        self._expand_symbol(x, rule_path) for x in rule_details.get(key, [])]
+  def _expand_symbols_in_rule(self, rule_details, rule_path):
+    """Expand symbols in the rule details dictionary."""
+    for key in EXPAND_RULE_KEYS:
+      value = rule_details.get(key, [])
+      rule_details[key] = [self._expand_symbol(x, rule_path) for x in value]
+    for key in EXPAND_VARS_KEYS:
+      value = rule_details.get(key, [])
+      rule_details[key] = [su.expand_env_vars(x) if x.startswith(
+                           su.PC_DEPS_PREFIX) else x for x in value]
 
   def _get_rule_file(self, rule_symbol):
     """Get rule file from rule symbol."""
@@ -114,12 +126,7 @@ class RuleBuilder(object):
     rule_details[su.PATH_KEY] = rule_path
     assert su.NAME_KEY not in rule_details
     rule_details[su.NAME_KEY] = rule_name
-    self._expand_symbols_in_key(rule_details, rule_path, su.DEPS_KEY)
-    self._expand_symbols_in_key(rule_details, rule_path, su.COMPILE_DEPS_KEY)
-    self._expand_symbols_in_key(rule_details, rule_path, su.PACKAGE_TESTS_KEY)
-    self._expand_symbols_in_key(rule_details, rule_path, su.PACKAGE_MODULES_KEY)
-    self._expand_symbols_in_key(rule_details, rule_path,
-                                su.EXTRACT_RESOURCES_DEP_KEY)
+    self._expand_symbols_in_rule(rule_details, rule_path)
     if su.RELEASE_PACKAGE_TYPE == rule_details[su.TYPE_KEY]:
       rule_details[su.DEPS_KEY].extend(rule_details[su.PACKAGE_MODULES_KEY])
       rule_details[su.DEPS_KEY].extend(rule_details[su.PACKAGE_TESTS_KEY])

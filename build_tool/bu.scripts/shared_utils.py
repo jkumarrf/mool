@@ -268,9 +268,10 @@ def path_exists(file_path):
 
 def expand_env_vars(dep_path):
   """Retrieve dependency file path by expanding environment variables."""
+  if not dep_path.startswith(PC_DEPS_PREFIX):
+    return dep_path
   path_parts = dep_path.split(os.sep)
   env_var = path_parts[0]
-  assert env_var.startswith(PC_DEPS_PREFIX)
   path_parts[0] = os.environ[env_var[len(PC_DEPS_PREFIX):]]
   result = os.sep.join(path_parts)
   assert path_exists(result)

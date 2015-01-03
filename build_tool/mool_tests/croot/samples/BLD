@@ -43,10 +43,10 @@
 "person_proto_main": {
   "rule_type": "cc_bin",
   "srcs": ["person_proto_main.cc"],
-  "incdirs": ["/usr/local/include"],
-  "deps": [
-      ".person_cc_proto"],
-  "sys_deps": ["-lprotobuf", "-lpthread", "-pthread"]
+  "incdirs": ["/usr/local/include", "env.PROTOBUF_INSTALL_DIR/include"],
+  "deps": [".person_cc_proto"],
+  "sys_deps": ["-lprotobuf", "-lpthread", "-pthread"],
+  "compile_params": ["-L", "env.PROTOBUF_INSTALL_DIR/lib"]
 },
 
 # Unit Tests.
