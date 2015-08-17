@@ -460,3 +460,5 @@ There are quite a lot of other environment variables which are core to functioni
 - **THRIFT_COMPILER**: full path to `thrift` executable.
 - **THRIFT_DIR**: thrift libs and headers are kept here after compilation of thrift sources.
 - **VALGRIND_PREFIX**: path to [`valgrind`](http://valgrind.org) executable along with any other command line parameters (except the test binary). This is used for memory leak testing of cc libs and binaries.
+
+> Huge thanks to [StackEdit](https://stackedit.io) without which this documentation wouldn't have been possible.
