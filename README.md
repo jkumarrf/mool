@@ -189,7 +189,6 @@ Each `java_lib` and `java_bin` rule produces one out file (.jar) which is named 
 - **includeDeps**: extra key to specify if "deps" should be packed with final jar or not, default `False` for `java_test` rule, `True` otherwise _(bool)_
 - **java_version**: java version string to be passed to `--source` and `--target` params of `javac` command. It has to be at least the jdk version you are using _(str)_
 
----
 
 ### 2. C++ Build Rules.
 `cc_lib` creates a collection of object (.o) files and copies mentioned headers (.h) files to output directory. `cc_bin` and `cc_test` create single executable file. We support [GMOCK](https://code.google.com/p/googlemock/) for cc tests.
@@ -243,7 +242,6 @@ Each `java_lib` and `java_bin` rule produces one out file (.jar) which is named 
 }
 ```
 
----
 
 ### 3. Python Build Rules.
 `py_lib` compiles and packs all python sources into a zip file, `py_bin` appends an executable header to _py_lib_ zip and `py_test` creates python library and runs it using [py.test](http://pytest.org/latest/). All dependencies of a rule are always packed to create a standalone python library or binary.
@@ -287,7 +285,6 @@ Mool also does [pylint](http://www.pylint.org/) and [pep8](https://pypi.python.o
 Other keys:
 - **py_skiplint**: "true" or "false". It can be used to disable pylint & pep8 checking.
 
----
 
 ### 4. Scala Build Rules.
 Scala build rules are mostly same as java build rules except that the rule names are different. We use [scalatest](http://www.scalatest.org/) to run scala tests. Mool supports multiple versions of `scala` and one can specify the desired scala version using `scala_version` key. There must be an environment variable `SCALA_HOME_[VERSION]` ('.' replace with '_' in version number) for the version you mention in scala rule i.e. `SCALA_HOME_2_10` should be set if you are specifying "2.10" in the build rule.
