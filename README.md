@@ -16,7 +16,7 @@ The current implementation has been extended from another implementation of
 #### Installation
 Checkout latest code from this repository and run following command from repo
 root:
-`python2.7 installer/install\_mooltool.py`
+`python2.7 installer/install_mooltool.py`
 
 Above command takes some time and creates a complete working setup in your
 current working directory. For more installation options run installer script
@@ -51,21 +51,50 @@ It requires following prerequisites:
 * openssl >= 1.0.0
 
 Environment variables useful for installation:
-- **JAVA_HOME**: In case you have more than one JDKs installed or you have java installation in custom path, you can appropriately set _JAVA_HOME_ environment variable.
-- **OPENSSL_INSTALL_PATH**: Latest OpenSSL version is required to compiled thrift from source. You can check your current version using `openssl -v`. In case you have openssl installation in custom path, set environment variable _OPENSSL_INSTALL_PATH_.
+- **JAVA_HOME**: In case you have more than one JDKs installed or you have java
+installation in custom path, you can appropriately set _JAVA_HOME_ environment
+variable.
+
+- **OPENSSL_INSTALL_PATH**: Latest OpenSSL version is required to compile thrift
+from source. You can check your current version using `openssl -v`. In case you
+have openssl installation in custom path, set environment variable
+_OPENSSL_INSTALL_PATH_ which is picked up by install script.
 
 ---
 # Documentation
 
 ### Key concepts:
-- **BUILD_ROOT**:  Top level directory of your project or repository. Rules can refer to other build rules only within the BUILD_ROOT.
-It is often recommended to create all projects within a single BUILD_ROOT so that all the projects can share code with each.
-- **BLD** file: Build rules are kept in BLD files and you can have a BLD file in any directory inside BUILD_ROOT except the BUILD_ROOT directory itself.
-- **build rule**: A json dictionary which specifies how to build a get set of source files. Each build rule has a rule name.
-- **BU_SCRIPT_DIR**: All mool scripts (python code) are located in this directory. `bu` command is an alias to `bu` script (bash) inside  `BU_SCRIPT_DIR` directory.
-- **BUILD_WORK_DIR**:  Each rule uses a dedicated working directory for all rule building purposes. It creates a directory at `${BUILD_WORK_DIR}/path/to/rule/rule_name` path for each rule before building a rule.
-- **BUILD_OUT_DIR**: Final output of all build rules goes in this directory. We usually create symbolic links from appropriate path in BUILD_WORK_DIR to this directory. Each rule's output goes in rule specific directory at `${BUILD_OUT_DIR}/path/to/rule/rule_name` path.
-- **SUBMITQ**: Each directory inside build root can have a file named `SUBMITQ` which has a list of rules (separated by new line) to be built when anything inside that directory is changed. `bu do_test_changes <path_to_change_list>` command goes through the list of changed files and then picks up `SUBMITQ` file from _all the directories in the path to changed file_.
+- **BUILD_ROOT**:  Top level directory of your project or repository. Rules can
+refer to other build rules only within the BUILD_ROOT. It is often recommended
+to create all projects within a single BUILD_ROOT so that all the projects can
+share code.
+
+- **BLD** file: Build rules are kept in BLD files and you can have a BLD file
+in any directory inside BUILD_ROOT except the BUILD_ROOT directory itself.
+
+- **build rule**: A json dictionary which specifies how to build a given set of
+source files. Each build rule has a rule name.
+
+- **BU_SCRIPT_DIR**: All mool scripts (python code) are located in
+[this](build_tools/bu.scripts) directory. `bu` command is an alias to
+[bu](build_tools/bu.scripts/bu) script (bash) inside `BU_SCRIPT_DIR` directory.
+
+- **BUILD_WORK_DIR**:  Each rule uses a dedicated working directory for all rule
+building purposes. It creates a directory at
+`${BUILD_WORK_DIR}/path/to/rule/rule_name` path for each rule before building
+it.
+
+- **BUILD_OUT_DIR**: Final output of all build rules goes in this directory. We
+usually create symbolic links from appropriate path in BUILD_WORK_DIR to this
+directory. Each rule's output goes in rule specific directory at
+`${BUILD_OUT_DIR}/path/to/rule/rule_name` path.
+
+- **SUBMITQ**: Each directory inside build root can have a file named
+[`SUBMITQ`](build_tool/mool_tests/croot/common/SUBMITQ) which has a list of
+rules (separated by new line) to be built when anything inside that directory
+is changed. `bu do_test_changes <path_to_change_list>` command goes through the
+list of changed files and then picks up `SUBMITQ` file from _all the directories
+in the path to changed file_.
 
 ### General Rule Format
 BLD file format is mostly _JSON_ with _comments_. Each rule has a `rule_name` which hold a dictionary of key/value pairs. Most rules have following skelton:
