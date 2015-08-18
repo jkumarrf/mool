@@ -76,8 +76,8 @@ in any directory inside BUILD_ROOT except the BUILD_ROOT directory itself.
 source files. Each build rule has a rule name.
 
 - **BU_SCRIPT_DIR**: All mool scripts (python code) are located in
-[this](build_tools/bu.scripts) directory. `bu` command is an alias to
-[bu](build_tools/bu.scripts/bu) script (bash) inside `BU_SCRIPT_DIR` directory.
+[this](build_tool/bu.scripts) directory. `bu` command is an alias to
+[bu](build_tool/bu.scripts/bu) script (bash) inside `BU_SCRIPT_DIR` directory.
 
 - **BUILD_WORK_DIR**:  Each rule uses a dedicated working directory for all rule
 building purposes. It creates a directory at
@@ -90,14 +90,15 @@ directory. Each rule's output goes in rule specific directory at
 `${BUILD_OUT_DIR}/path/to/rule/rule_name` path.
 
 - **SUBMITQ**: Each directory inside build root can have a file named
-[`SUBMITQ`](build_tool/mool_tests/croot/common/SUBMITQ) which has a list of
-rules (separated by new line) to be built when anything inside that directory
-is changed. `bu do_test_changes <path_to_change_list>` command goes through the
-list of changed files and then picks up `SUBMITQ` file from _all the directories
-in the path to changed file_.
+[`SUBMITQ`](build_tool/mool_tests/jroot/src/main/java/some/other/work/SUBMITQ)
+which has a list of rules (separated by new line) to be built when anything
+inside that directory is changed. `bu do_test_changes <path_to_change_list>`
+command goes through the list of changed files and then picks up `SUBMITQ` file
+from _all the directories in the path to changed file_.
 
 ### General Rule Format
-BLD file format is mostly _JSON_ with _comments_. Each rule has a `rule_name` which hold a dictionary of key/value pairs. Most rules have following skelton:
+BLD file format is mostly _JSON_ with _comments_. Each rule has a `rule_name`
+which hold a dictionary of key/value pairs. Most rules have following skelton:
 ```python
 "rule_name": {
     "rule_type": <java_lib/cc_bin/...>
@@ -105,6 +106,7 @@ BLD file format is mostly _JSON_ with _comments_. Each rule has a `rule_name` wh
     "deps": [List of dependencies]
 }
 ```
+
 #### Supported Rule types:
 - **c++**: `cc_lib`, `cc_bin`, `cc_test`
 - **java**: `java_lib`, `java_bin`, `java_test`
@@ -116,18 +118,24 @@ BLD file format is mostly _JSON_ with _comments_. Each rule has a `rule_name` wh
 - **packaging**: `file_coll`, `release_package`
 
 #### Dependency path:
-You can specify dependencies on other rules and mool builds all rule dependencies before building given rule. Dependencies can have a full path which is of the format `mool.path.to.bld.file.RuleName` or it can be relative path w.r.t given BLD file.
+You can specify dependencies on other rules and mool builds all rule
+dependencies before building given rule. Dependencies can have a full path,
+which is of the format `mool.path.to.bld.file.RuleName` or it can be a relative
+path w.r.t given BLD file.
 
 Examples:
-* "mool.java.com.example.project.MyPrototype" refers to a rule named `MyPrototype` described in file at path `${BUILD_ROOT}/java/com/example/project/BLD`.
-* ".Slf4jApi" refers to build rule in same BLD file. Notice the **'.'** in the beginning.
-* ".resources.TestResources" refers to a build rule in file `<current_directory>/resources/BLD` with name `TestResources`.
+* "mool.java.com.example.project.MyPrototype" refers to a rule named
+`MyPrototype` described in file at path `${BUILD_ROOT}/java/com/example/project/BLD`.
+* ".Slf4jApi" refers to build rule in same BLD file. Notice the **'.'** in the
+beginning.
+* ".resources.TestResources" refers to a build rule in file
+`<current_directory>/resources/BLD` with name `TestResources`.
 
 ---
 
-
 ### 1. Java Build Rules.
-Each `java_lib` and `java_bin` rule produces one out file (.jar) which is named after `rule_name`.
+Each `java_lib` and `java_bin` rule produces one out file (.jar) which is named
+after `rule_name`.
 ```python
 # Libraries.
 "HelloWorld": {
@@ -196,31 +204,49 @@ Each `java_lib` and `java_bin` rule produces one out file (.jar) which is named 
 
 #### Details of Java rule keys
 - **rule_name**: One of [`java_lib`, `java_bin`, `java_test`]
-- **srcs**: Java source files present in the _same directory_ as BLD file _(list)_
+- **srcs**: Java source files present in the _same directory_ as BLD file
+_(list)_
 - **deps**: deps used for compiling and packed with final rule output _(list)_
 - **compileDeps**: deps used only for compilation _(list)_
-- **precompiled_deps**: external deps without a build rule, example: `/user/home/path/to/jar` or `env.HOME/path/to/jar`. We expand env.`<variable_name>` by looking up environment variables  _(list)_
+- **precompiled_deps**: external deps without a build rule, example:
+`/user/home/path/to/jar` or `env.HOME/path/to/jar`. We expand
+`env.<variable_name>` by looking up environment variables  _(list)_
 - **compile_params**: arguments for javac compiler  _(list)_
 - **runtime_params**: arguments for java binary, used for java_test  _(list)_
-- **test_groups**: list of [TestNg](http://testng.org/doc/index.html) groups to run tests on  _(list)_
-- ~~**test_class**~~: test class name; _deprecated_ instead use `test_classes` _(str)_
+- **test_groups**: list of [TestNg](http://testng.org/doc/index.html) groups to
+run tests on  _(list)_
+- ~~**test_class**~~: test class name; _deprecated_ instead use `test_classes`
+_(str)_
 - **test_classes**: list of classes to be passed to TestNg _(list)_
 - **main_class**: main java class for making executable jar _(str)_
-- **maven_specs**: maven specifications for referring to thirdparty jars (artifacts) _(dict)_
+- **maven_specs**: maven specifications for referring to thirdparty jars
+(artifacts) _(dict)_
   - *repo_url*: artifact repo url
   - *group_id*: artifact group id
   - *artifact_id*: artifact id
   - *version*: artifact version number
   - *classifier*: artifact classifier (**optional**)
-- **extract_deps**: list of deps to be extracted in cwd during test execution, useful for file read/write tests _(list)_
-- **jar_include_paths**: list of paths to be included in final jar; for a directory path, whole directory is included, i.e. `com/example/project1` will include all the classes which are inside com/example/project1 directory of _(list)_
-- **jar_exclude_paths**: list of paths to be excluded, *this is applied before inclusions*. Usually only one of the inclusion or exclusion rule is sufficient _(list)_
-- **includeDeps**: extra key to specify if "deps" should be packed with final jar or not, default `False` for `java_test` rule, `True` otherwise _(bool)_
-- **java_version**: java version string to be passed to `--source` and `--target` params of `javac` command. It has to be at least the jdk version you are using _(str)_
-
+- **extract_deps**: list of deps to be extracted in cwd during test execution,
+useful for file read/write tests _(list)_
+- **jar_include_paths**: list of paths to be included in final jar; for a
+directory path, whole directory is included, i.e. `com/example/project1` will
+include all the classes which are inside com/example/project1 directory across
+all the dependencies and the main sources _(list)_
+- **jar_exclude_paths**: list of paths to be excluded, *this is applied before
+inclusions*. Usually only one of the inclusion or exclusion rule is sufficient
+_(list)_
+- **includeDeps**: extra key to specify if "deps" should be packed with final
+jar or not, default `False` for `java_test` rule, `True` otherwise _(bool)_
+- **java_version**: java version string to be passed to `--source` and
+`--target` params of `javac` command. It has to be at least the jdk version you
+are using _(str)_
 
 ### 2. C++ Build Rules.
-`cc_lib` creates a collection of object (.o) files and copies mentioned headers (.h) files to output directory. `cc_bin` and `cc_test` create single executable file. We support [GMOCK](https://code.google.com/p/googlemock/) for cc tests.
+`cc_lib` creates a collection of object (.o) files and copies mentioned headers
+(.h) files to output directory. `cc_bin` and `cc_test` create single executable
+file. We support [GMOCK](https://code.google.com/p/googlemock/) and
+[GTEST](https://code.google.com/p/googletest/) for cc tests.
+
 ```python
 # Libraries.
 "hello_world": {
@@ -273,11 +299,24 @@ Each `java_lib` and `java_bin` rule produces one out file (.jar) which is named 
 
 
 ### 3. Python Build Rules.
-`py_lib` compiles and packs all python sources into a zip file, `py_bin` appends an executable header to _py_lib_ zip and `py_test` creates python library and runs it using [py.test](http://pytest.org/latest/). All dependencies of a rule are always packed to create a standalone python library or binary.
+`py_lib` compiles and packs all python sources into a zip file, `py_bin`
+appends an executable header to _py_lib_ zip and `py_test` creates python
+library and runs it using [py.test](http://pytest.org/latest/). All
+dependencies of a rule are always packed to create a standalone python library
+or binary.
 
-As of now we don't support a direct way to refer to thirdparty python dependencies but we use python [virtual environment](https://virtualenv.pypa.io/en/latest/) for running all mool commands so one can simply install the required dependencies using `pip install <dep_name==version>` command. Even better maintain a `requirements.txt` file and just use `pip install -r path/to/requirements.txt` file to install all dependencies from requirements file.
+As of now we don't support a direct way to refer to thirdparty python
+dependencies but we use python
+[virtual environment](https://virtualenv.pypa.io/en/latest/) for running all
+mool commands so one can simply install the required dependencies using
+`pip install <dep_name==version>` command. Even better maintain a
+`requirements.txt` file and just use `pip install -r path/to/requirements.txt`
+to install all dependencies from requirements file.
 
-Mool also does [pylint](http://www.pylint.org/) and [pep8](https://pypi.python.org/pypi/pep8) checking for you for all python rules by default!
+Mool also does [pylint](http://www.pylint.org/) and
+[pep8](https://pypi.python.org/pypi/pep8) checking for you for all python rules
+by default!
+
 ```python
 # Libraries.
 "hello_world_utils": {
@@ -290,7 +329,7 @@ Mool also does [pylint](http://www.pylint.org/) and [pep8](https://pypi.python.o
     "srcs": ["json_linter.py"],
     # You can get thirdparty deps which are not in mool env
     # packed with final lib using this key.
-    "precompiled_deps": ["/Path/to/simplejson"]
+    "precompiled_deps": ["/Path/to/pysimplejson/module"]
 },
 
 # Binaries.
@@ -312,22 +351,38 @@ Mool also does [pylint](http://www.pylint.org/) and [pep8](https://pypi.python.o
 }
 ```
 Other keys:
-- **py_skiplint**: "true" or "false". It can be used to disable pylint & pep8 checking.
+- **py_skiplint**: "true" or "false". It can be used to disable lint checking.
 
 
 ### 4. Scala Build Rules.
-Scala build rules are mostly same as java build rules except that the rule names are different. We use [scalatest](http://www.scalatest.org/) to run scala tests. Mool supports multiple versions of `scala` and one can specify the desired scala version using `scala_version` key. There must be an environment variable `SCALA_HOME_[VERSION]` ('.' replace with '_' in version number) for the version you mention in scala rule i.e. `SCALA_HOME_2_10` should be set if you are specifying "2.10" in the build rule.
+Scala build rules are mostly same as java build rules except that the rule
+names are different. We use [scalatest](http://www.scalatest.org/) to run scala
+tests. Mool supports multiple versions of `scala` and one can specify the
+desired scala version using `scala_version` key. There must be an environment
+variable `SCALA_HOME_[VERSION]` ('.' replace with '_' in version number) for
+the version you mention in scala rule i.e. `SCALA_HOME_2_10` should be set if
+you are specifying "2.10" in a build rule.
 
-Also `SCALA_DEFAULT_VERSION` should be set to the default version for example "2.11". Mool installer setups scala 2.8(default), 2.10, 2.11 for you.
+Also `SCALA_DEFAULT_VERSION` should be set to the default version for example
+"2.11". Mool installer sets up scala 2.8(default), 2.10, 2.11 for you.
 
 ### 5. Clojure Build Rules.
-Clojure support two [modes of compilation](http://clojure.org/compilation):
-- **AOT** (Ahead Of Time): Scala source file is compiled and packed into final jar.
-- **Direct**: Sources are not compiled instead packed directly into the final jar.
+Clojure supports two [modes of compilation](http://clojure.org/compilation):
+- **AOT** (Ahead Of Time): Scala source file is compiled and packed into final
+jar.
+- **Direct**: Sources are not compiled instead packed directly into the final
+jar.
 
-Since clojure compiler generates a _class_ file for each function, each clojure (`clj`) source ends up generating huge number of class files (clojure being a functional programming language adds to this count). By default the non-AOT sources are also compiled and checked for any compilation errors but _developers_ can set `BUILD_CLOJURE_NONAOT` to `true` to skip compilation of non-AOT sources and keep the builds faster.
+Since clojure compiler generates a _class_ file for each function, each clojure
+(`clj`) source ends up generating large number of class files (clojure being a
+functional programming language adds to this count). By default the non-AOT
+sources are also compiled and checked for any compilation errors but
+_developers_ can set `BUILD_CLOJURE_NONAOT` to `true` to skip compilation of
+non-AOT sources and keep the builds faster.
 
-**Note:** Clojure being java interop, it's build rules support most features supported by java build rules. In fact mool drives clojure and scala rule handling classes from java class ;)
+**Note:** Clojure being java interop, it's build rules support most features
+supported by java build rules. In fact mool drives clojure and scala rule
+handling classes from java rule handler class ;)
 
 ```python
 # Libraries.
@@ -351,7 +406,6 @@ Since clojure compiler generates a _class_ file for each function, each clojure 
 # Binaries.
 "MyExecutable": {
     "rule_type": "clojure_bin",
-
     "srcs": ["echo_name.clj"],
     "main_class": "com.example.EchoName",
     # Optionally pack clojure core classes in final jar to
@@ -367,8 +421,12 @@ Since clojure compiler generates a _class_ file for each function, each clojure 
     "clojure_test_ns": ["com.example.HelloTest"]
 }
 ```
+
 ### 6. Protobuf Build Rules.
-Google [protobuf](https://developers.google.com/protocol-buffers/) is famous message exchange format, well known for its efficiency and wide use. Given a `.proto` file, mool compiles it using `protoc` compiler and creates a library for use with C++/Java/Python code.
+Google [protobuf](https://developers.google.com/protocol-buffers/) is famous
+message exchange format, well known for its efficiency and wide use. Given a
+`.proto` file, mool compiles it using `protoc` compiler and creates a library
+for use with C++/Java/Python code.
 
 ```python
 # Proto rules for creating a cc library (.o + .h) files.
@@ -408,15 +466,24 @@ Google [protobuf](https://developers.google.com/protocol-buffers/) is famous mes
     "precompiled_deps": ["env.PYTHON_PROTOBUF_DIR"]
 }
 ```
-As a fact _protoc_ compiler generates _single_ cc file (`.pb.cc`) and single header file (`.pb.h`) and the generated cc file is compiled to generate an object file.
+For `cc_proto_lib` rule, _protoc_ compiler generates _single_ cc file
+(`.pb.cc`) and single header file (`.pb.h`) and the generated cc file is
+compiled to generate an object file.
 
 ### 7. Thrift Build Rules.
-Apache [thrift](https://thrift.apache.org/) is another famous message exchange protocol. It is very similar to protobuf rules as far as mool is concerned. Given a `.thrift`  file, it uses _thrift_ compiler to generate a C++/Java/Python library. Its rules are analogous to proto rules naming `cc_thrift_lib`, `java_thrift_lib` and `py_thrift_lib`.
+Apache [thrift](https://thrift.apache.org/) is another famous message exchange
+protocol. Given a `.thrift`  file, it uses _thrift_ compiler to generate a
+C++/Java/Python library. Its rules are analogous to proto rules naming
+`cc_thrift_lib`, `java_thrift_lib` and `py_thrift_lib`.
 
-Note that for one `.thrift` file, _thrift_ compiler usually generates _multiple_ cc sources which result in multiple '.o' files.
+Note that for one `.thrift` file, _thrift_ compiler usually generates
+_multiple_ cc sources which result in multiple '.o' files.
 
 ### 8. Packaging Build Rules.
-There are two packaging rules, `file_coll` for creating a _jar_ file of raw resource files and `release_package` for packaging output of different types of build rules into one package. For instance, you can create a final _zip_ file with some bash scripts and python binaries using `release_package` rule..
+There are two packaging rules, `file_coll` for creating a _jar_ file of raw
+resource files and `release_package` for packaging output of different types of
+build rules into one package. For instance, you can create a final _zip_ file
+with some bash scripts and python binaries using `release_package` rule.
 
 ```python
 # Create a jar file with given srcs at given file package
@@ -447,47 +514,108 @@ There are two packaging rules, `file_coll` for creating a _jar_ file of raw reso
         "mool.project.combined.AllTests"]
 }
 ```
-For `release_package` rule, all build rules in `package_modules` are built and tested (tests are run if it's a test rule) and all the test rules in `package_tests` are tested and _MUST_ pass for the `release_package` rule to pass and create one final archive file.
+For `release_package` rule, all build rules in `package_modules` are built and
+all the test rules in `package_tests` are tested which _MUST_ pass for the
+`release_package` rule to pass and create one final archive file.
 
 Other Keys:
-- **archive_type**:  Valid only for `file_coll` rule, possible value are "zip" or "jar" with default as "jar".
-- **extract_in_zip**:  List of rules _from_ `package_module` keys to be extracted before creating final zip. For instance one may want to unzip a bunch of bash script coming from `file_coll` rule in zip because o/w they are packages as a zip/jar file inside release_package rule's final _zip_ file.
+- **archive_type**:  Valid only for `file_coll` rule, possible value are "zip"
+or "jar" with default as "jar".
+- **extract_in_zip**: List of rules _from_ `package_module` keys to be
+extracted before creating final zip. For instance one may want to unzip a bunch
+of bash scripts coming from `file_coll` rule in zip because o/w they are
+packaged as a zip/jar file inside release_package rule's final _zip_ file.
 
 ---
 
 ### Useful Environment variables
-Mool is highly driven by environment variables. You need not know details of all of them but some of the most useful ones are as follows:
+Mool is highly driven by environment variables. You need not know details of
+all of them but some of the most useful ones are as follows:
 
-- **DEBUG_MODE**: Set this to "true" to run mool in debug mode. It prints sequence of commands that mool runs for building/testing a rule. It is quite helpful when you have some expected error and you want details of what commands were actually run the background.
+- **DEBUG_MODE**: Set this to "true" to run mool in debug mode. It prints
+sequence of commands that mool runs for building/testing a rule. It is quite
+helpful when you have some unexpected error and you want details of what
+commands were actually run the background.
+
 - **DEVELOPER_MODE**: If set to "true", mool does following addition stuff:
  - downloads java maven _source_ jar as well along with main jar.
- - emits detailed warnings when there are multiple versions of a class in java test dependencies.
-- **BUILD_CLOJURE_NONAOT**: If set to "false", it skips syntax validation (using compilation, feel free to suggest a better way) of non-AOT clojure sources. It is recommended NOT to set this on build servers so that unhealthy code be flagged.
-- **CLOJURE_SRCS_ROOT**: Unlike java, clojure compilation and testing requires clojure sources directory in _classpath_ with the path from that directory to clojure source matching the source [_namespace_](http://clojure.org/namespaces). This path is _relative to BUILD_ROOT_. For example if your clojure project namespace starts with 'com.example' and all your clojure code is in `${BUILD_ROOT}/cljroot` directory, set `CLOJURE_SRCS_ROOT="cljroot"`.
-- **MAVEN_PREFER_LOCAL_REPO**: By default mool fetches jars of `java_lib` rules with maven details from repository specified in rule details. One can set this variable to a local repository which follows maven structure to try and look for jar sources locally and try external sources afterwards. For example setting `MAVEN_PREFER_LOCAL_REPO="${HOME}/.m2/repository"` will instruct mool to try local maven repository for all the jars it needs.
-- **ECLIPSE_WORKSPACE_DIR**: Used by `setup_eclipse_project` extension, it instructs mool to use specified directory as workspace directory and create a directory with requested project name and then create _.classpath_ and _.project_ files inside that directory.
+ - emits detailed warnings when there are multiple versions of a class in java
+ test dependencies.
 
-There are quite a lot of other environment variables which are core to functioning of mool. You are **strongly recommended** to use mool installer which sets all these environment varilables correctly in _mool_init.sh_ file. Following is the meaning of each of these:
+- **BUILD_CLOJURE_NONAOT**: If set to "false", it skips syntax validation
+(using compilation, feel free to suggest a better way) of non-AOT clojure
+sources. It is recommended NOT to set this on build servers so that unhealthy
+code is flagged.
 
-- **BOOST_DIR**: after compilation of boost sources, its _libs_ and _headers_ are moved into this directory
+- **CLOJURE_SRCS_ROOT**: Unlike java, clojure compilation and testing requires
+_clojure sources_ directory in _classpath_ with the path from that directory to
+clojure source matching the [_namespace_](http://clojure.org/namespaces)
+definition in the source. This path is _relative to BUILD_ROOT_. For example if
+your clojure project namespace starts with 'com.example' and all your clojure
+code is in `${BUILD_ROOT}/cljroot` directory, set `CLOJURE_SRCS_ROOT="cljroot"`.
+
+- **MAVEN_PREFER_LOCAL_REPO**: By default mool fetches jars of `java_lib` rules
+with maven details from repository specified in rule details. One can set this
+variable to a local repository which follows maven structure to try and look
+for jar sources locally and try external sources if local fails. For example
+setting `MAVEN_PREFER_LOCAL_REPO="${HOME}/.m2/repository"` will instruct mool
+to try local `.m2` repository for all the jars it needs.
+
+- **ECLIPSE_WORKSPACE_DIR**: Used by `setup_eclipse_project` extension, it
+instructs mool to use specified directory as workspace directory and within
+which it creates a directory with requested project name and then creates
+_.classpath_ and _.project_ files inside that directory.
+
+There are quite a lot of other environment variables which are core to
+functioning of mool. You are **strongly recommended** to use
+[mool installer](#installation) which sets all these environment varilables
+correctly in _mool_init.sh_ file. Following is the meaning of each of these:
+
+- **BOOST_DIR**: after compilation of boost sources, its _libs_ and _headers_
+are moved into this directory
 - **CC_COMPILER:** path to g++ compiler to use
 - **CC_INSTALL_PREFIX**: libs and headers for _gmock_, _gtest_ and _protobuf_
 - **CLOJURE_DEFAULT_VERSION**: default clojure version to use i.e. "1.6"
-- **JAR_SEARCH_PATH**: directory path to store all maven downloaded jars
+- **JAR_SEARCH_PATH**: directory path to store all maven downloaded jars. Mool
+maintains this jar cache and use it for future builds of that rule.
 - **JAVA_COMPILER**: path to `javac` executable
-- **JAVA_DEFAULT_VERSION**: default `--source` and `--target` arguments to be passed to `javac`. We do a strict dependency checking between a build rule and its dependency for its _java_version_ key. _A lower java version build rule cannot depend on higher java version!_
-- **JAVA_HOME**: path to java home directory to use. It is assumed that all java related executables are in `${JAVA_HOME}/bin/` directory (default java installation standards).
+- **JAVA_DEFAULT_VERSION**: default `--source` and `--target` arguments to be
+passed to `javac`. We do a strict dependency checking between a build rule and
+its dependencies for its _java_version_ key. _A lower java version build rule
+cannot depend on higher java version!_
+- **JAVA_HOME**: path to java home directory to use. It is assumed that all
+java related executables are in `${JAVA_HOME}/bin/` directory.
 - **JAVA_PROTOBUF_JAR**: full path to protobuf jar.
-- **JAVA_TEST_DEFAULT_JARS**: Add ";" separated list of full paths to jars which each test should include. i.e. you can add _testng_ and _jcommander_ jars here instead of specifying them in each test rule.
-- **JAVA_THRIFT_JARS**: Full path to thrift jar required for compiling generated java code. Usually thrift requires `log4j` jar as well so you can add both the jars (and any other as well) as ";" separated string.
-- **PEP8_BINARY**: full path to `pep8` binary to use for lint checking. You can add other command line parameters as well here i.e. `/usr/bin/pep8 --max-line-length=80 --ignore=E111`.
+- **JAVA_TEST_DEFAULT_JARS**: Add ";" separated list of full paths to jars
+which each test should include. i.e. you can add _testng_ and _jcommander_ jars
+here instead of specifying them in each test rule.
+- **JAVA_THRIFT_JARS**: Full path to thrift jar required for compiling
+generated java code. Usually thrift requires `log4j` jar as well so you can add
+both the jars (and any other as well) as ";" separated string.
+- **PEP8_BINARY**: full path to `pep8` binary to use for lint checking. You can
+add other command line parameters as well here i.e.
+`/usr/bin/pep8 --max-line-length=80 --ignore=E111`.
 - **PROTO_COMPILER**: full path to `protoc` executable
-- **PYLINT_RC_FILE**: full path of `pylint` rcfile which has the required lint configuration.
-- **SCALA_DEFAULT_VERSION**: default scala version to use i.e "2.10". Make sure that you have `SCALA_HOME_X_Y` defined for scala version "x.y" you want to use.
-- **SCALA_HOME_X_Y**: Path root directory of scala (similar to java) for each version separately.
-- **SUBMITQ_DEBUG_MODE**: prints list of affected rules from given list of changed files before building/testing them.
+- **PYLINT_RC_FILE**: full path of `pylint` rcfile which has the required lint
+configuration.
+- **SCALA_DEFAULT_VERSION**: default scala version to use i.e "2.10". Make sure
+that you have `SCALA_HOME_X_Y` defined for scala version "x.y" you want to use.
+- **SCALA_HOME_X_Y**: Path root directory of scala (similar to java) for each
+version separately.
+- **SUBMITQ_DEBUG_MODE**: prints list of affected rules from given list of
+changed files before building/testing them.
 - **THRIFT_COMPILER**: full path to `thrift` executable.
-- **THRIFT_DIR**: thrift libs and headers are kept here after compilation of thrift sources.
-- **VALGRIND_PREFIX**: path to [`valgrind`](http://valgrind.org) executable along with any other command line parameters (except the test binary). This is used for memory leak testing of cc libs and binaries.
+- **THRIFT_DIR**: thrift libs and headers are kept here after compilation of
+thrift sources.
+- **VALGRIND_PREFIX**: path to [`valgrind`](http://valgrind.org) executable
+along with any other command line parameters (except the test binary). This is
+used for memory leak testing of cc libs and binaries.
 
-> Huge thanks to [StackEdit](https://stackedit.io) without which this documentation wouldn't have been possible.
+---
+
+> Huge thanks to [StackEdit](https://stackedit.io) without which this
+documentation wouldn't have been possible.
+
+Any pull requests are welcomed for bugs, documentation or new features!
+
+We hope you will love using it :)
